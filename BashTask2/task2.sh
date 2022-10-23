@@ -8,8 +8,6 @@ touch $path/output.json
 
 #$path/output.json
 #$path/output.txt
-
-
 stage="start"
 success=0
 failed=0
