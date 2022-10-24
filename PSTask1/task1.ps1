@@ -28,14 +28,18 @@ process {
     try {
         Write-Host "Processing..." -ForegroundColor DarkGray
 
-        # Check if network_mask contains '.', because only ip-type mask contain '.'
-        if ($network_mask -Match "."){
-            [IPAddress]$netMask = [Net.IPAddress]::Parse($network_mask)
+        # Check if network_mask num 
+        if ($network_mask.Length -ge 3){
+            [IPAddress]$mask = [Net.IPAddress]::Parse($network_mask)
+            Write-Host "tst"
         } else {
-            # Init var like ip adress
-            [IPAddress]$netMask = 0
-            # Using type specific to get netmask in string
-            $netMask.Address = ([UInt32]::MaxValue) -shl (32 - $network_mask) -shr (32 - $network_mask)
+            # Convert num to demical IP
+            $network_mask = ([math]::Pow(2,$network_mask) - 1) * ([math]::Pow(2,32-$network_mask))
+            # Convert demical IP to standart IP form
+            $bin = [Convert]::ToString($network_mask,2)
+            $fullBin = "0" * (32 - $bin.Length) + $bin
+            $network_mask_str=[string]::Join(".", $(0,8,16,24 | %{[Convert]::ToInt32($fullBin.Substring($_,8),2)}))
+            [IPAddress]$mask = [Net.IPAddress]::Parse($network_mask_str)
         }
         $ipAddr1 = [Net.IPAddress]::Parse($ip_address_1)
         $ipAddr2 = [Net.IPAddress]::Parse($ip_address_2)
@@ -43,11 +47,11 @@ process {
         Write-Host "
             IP Address 1: $($ipAddr1.IPAddressToString)
             IP Address 2: $($ipAddr2.IPAddressToString)
-            Mask: $($netMask.IPAddressToString)
+            Mask: $($mask.IPAddressToString)
         " -ForegroundColor DarkMagenta
         # Getting subnets of IPs
-        $ipAddr1Band =  $ipAddr1.Address -band $netMask.address
-        $ipaddr2Band =  $ipAddr2.Address -band $netMask.address
+        $ipAddr1Band =  $ipAddr1.Address -band $mask.Address
+        $ipaddr2Band =  $ipAddr2.Address -band $mask.Address
         # Compare IPs
         if ($ipAddr2Band -eq $ipAddr1Band) {
             Write-host "ip_address_1 and ip_address_2 belong to the same network" -ForegroundColor Green

@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)]
-    $path = "./accounts.csv"
+    $csv_file_path = "./accounts.csv"
 )
 begin {
     # Turn all non-terminating errors into terminating ones
@@ -19,7 +19,7 @@ process {
     try {
         Write-Host "Processing..." -ForegroundColor DarkGray
 
-        $accounts = Import-Csv $path
+        $accounts = Import-Csv $csv_file_path
         
         foreach ($item in $accounts) {
             # Name format all letters to lower, title latters to upper
@@ -30,7 +30,7 @@ process {
         }
 
         # Generate new file path and export csv object
-        $newPath = $path.Insert($path.Length-4,"_new")
+        $newPath = $csv_file_path.Insert($csv_file_path.Length-4,"_new")
         $accounts | Export-Csv -Path $newPath -NoTypeInformation
         Write-Host "Path of new file: $newPath" -ForegroundColor Green
 
