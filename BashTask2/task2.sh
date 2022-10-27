@@ -1,13 +1,16 @@
 # Вырезать всё после “BLABLABLA”, фразу “BLABLABLA” оставить:
 # sed -r 's/(.+BLABLABLA).+/\1/'
 
-path=$1
-echo $path
-rm -R $path/output.json
-touch $path/output.json
+file_path_txt=$1
+echo $file_path_txt
+part_file_path=${csv_file_path::${#csv_file_path}-4} # delite last 4 symbols
+file_path_json=${file_path_txt/%".txt"/".json"}
+echo $file_path_json
+rm -R $file_path_json
+touch $file_path_json
 
 #$path/output.json
-#$path/output.txt
+#C:\GeorgeWork\Git\DevOps-Fundamentals\PSTask1\output.txt
 stage="start"
 success=0
 failed=0
@@ -16,8 +19,8 @@ do
     if [[ "${line:0:1}" = "[" ]] && [ "$stage" == "start" ]; then
         testName=${line:2}
         testName=$(echo $testName | sed -r 's/].+//')
-        echo "{" >> $path/output.json
-        echo "\"testName\":\"$testName\"," >> $path/output.json
+        echo "{" >> $file_path_json
+        echo "\"testName\":\"$testName\"," >> $file_path_json
 
     elif [[ "${line:1:1}" != "-" ]] && [ "$stage" == "main" ]; then
         status=$(echo $line | sed -r 's/(.+k).+/\1/')
@@ -35,25 +38,25 @@ do
             status="not valid"
         fi
         # Print to json
-        echo " {" >> $path/output.json
-        echo "  \"name\":\"$name\"," >> $path/output.json
-        echo "  \"status\":$status," >> $path/output.json
-        echo "  \"duration\":\"$duration\"" >> $path/output.json
-        echo " }," >> $path/output.json
+        echo " {" >> $file_path_json
+        echo "  \"name\":\"$name\"," >> $file_path_json
+        echo "  \"status\":$status," >> $file_path_json
+        echo "  \"duration\":\"$duration\"" >> $file_path_json
+        echo " }," >> $file_path_json
     fi
     # Start main part
     if [[ "${line:1:1}" = "-" ]] && [ "$stage" == "start" ]; then
         stage="main"
-        echo "\"tests\":[" >> $path/output.json
+        echo "\"tests\":[" >> $file_path_json
     # End main part
     elif [[ "${line:1:1}" = "-" ]] && [ "$stage" == "main" ]; then
         stage="result"
         sed -i '$ d' output.json # Delite last string in file
-        echo " }" >> $path/output.json
-        echo "]," >> $path/output.json
+        echo " }" >> $file_path_json
+        echo "]," >> $file_path_json
     fi
 
-done < $path/output.txt
+done < $file_path_txt
 
 # Take last string and print res
 if [[ "${line:1:1}" != "-" ]] && [ "$stage" == "result" ]; then
@@ -62,12 +65,12 @@ if [[ "${line:1:1}" != "-" ]] && [ "$stage" == "result" ]; then
         countfailed=$(echo $line | sed -r 's/,.+//')
         failed=$(echo ${line:${#countfailed}+1} | sed -r 's/ .+//')
         rating=$(echo ${line:${#countfailed}+${#failed}+2} | sed -r 's/%.+//' | sed 's|.*as ||')
-        echo "\"summary\": {" >> $path/output.json
-        echo " \"success\": $success," >> $path/output.json
-        echo " \"failed\": $failed," >> $path/output.json
-        echo " \"rating\": $rating," >> $path/output.json
-        echo " \"duration\": \"$duration\"" >> $path/output.json
-        echo " }" >> $path/output.json
-        echo "}" >> $path/output.json
+        echo "\"summary\": {" >> $file_path_json
+        echo " \"success\": $success," >> $file_path_json
+        echo " \"failed\": $failed," >> $file_path_json
+        echo " \"rating\": $rating," >> $file_path_json
+        echo " \"duration\": \"$duration\"" >> $file_path_json
+        echo " }" >> $file_path_json
+        echo "}" >> $file_path_json
 fi
 #echo "$stage"

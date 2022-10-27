@@ -26,12 +26,11 @@ begin {
 
 process {
     try {
-        Write-Host "Processing..." -ForegroundColor DarkGray
+        # Write-Host "Processing..." -ForegroundColor DarkGray
 
         # Check if network_mask num 
         if ($network_mask.Length -ge 3){
             [IPAddress]$mask = [Net.IPAddress]::Parse($network_mask)
-            Write-Host "tst"
         } else {
             # Convert num to demical IP
             $network_mask = ([math]::Pow(2,$network_mask) - 1) * ([math]::Pow(2,32-$network_mask))
@@ -44,20 +43,23 @@ process {
         $ipAddr1 = [Net.IPAddress]::Parse($ip_address_1)
         $ipAddr2 = [Net.IPAddress]::Parse($ip_address_2)
 
-        Write-Host "
-            IP Address 1: $($ipAddr1.IPAddressToString)
-            IP Address 2: $($ipAddr2.IPAddressToString)
-            Mask: $($mask.IPAddressToString)
-        " -ForegroundColor DarkMagenta
+        #Write-Host "
+        #    IP Address 1: $($ipAddr1.IPAddressToString)
+        #    IP Address 2: $($ipAddr2.IPAddressToString)
+        #    Mask: $($mask.IPAddressToString)
+        #" -ForegroundColor DarkMagenta
+        
         # Getting subnets of IPs
         $ipAddr1Band =  $ipAddr1.Address -band $mask.Address
         $ipaddr2Band =  $ipAddr2.Address -band $mask.Address
         # Compare IPs
         if ($ipAddr2Band -eq $ipAddr1Band) {
-            Write-host "ip_address_1 and ip_address_2 belong to the same network" -ForegroundColor Green
+            #Write-host "ip_address_1 and ip_address_2 belong to the same network" -ForegroundColor Green
+            Write-host "Yes" -ForegroundColor Green
             $res = $true
         } else {
-            Write-host "ip_address_1 and ip_address_2 do not belong to the same network" -ForegroundColor Red
+            #Write-host "ip_address_1 and ip_address_2 do not belong to the same network" -ForegroundColor Red
+            Write-host "No" -ForegroundColor Red
             $res = $false 
         }
 
@@ -67,10 +69,10 @@ process {
     }
 }
 end {
-    if ($isErrorState) {
-        Write-Host "An error occurred in the script `nDetailed information is provided in the error below:" -ForegroundColor Red
-        $catchedError
-    } else {
-        Return $res
-    }
+    #if ($isErrorState) {
+    #    Write-Host "An error occurred in the script `nDetailed information is provided in the error below:" -ForegroundColor Red
+    #    $catchedError
+    #} else {
+    #    Return $res
+    #}
 }
