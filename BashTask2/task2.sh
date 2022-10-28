@@ -2,18 +2,16 @@
 # sed -r 's/(.+BLABLABLA).+/\1/'
 
 file_path_txt=$1
-echo $file_path_txt
+#echo $file_path_txt
 part_file_path=${csv_file_path::${#csv_file_path}-4} # delite last 4 symbols
 file_path_json=${file_path_txt/%".txt"/".json"}
-echo $file_path_json
+#echo $file_path_json
 rm -R $file_path_json
 touch $file_path_json
-
-#$path/output.json
-#C:\GeorgeWork\Git\DevOps-Fundamentals\PSTask1\output.txt
 stage="start"
 success=0
 failed=0
+
 while IFS= read -r line
 do
     if [[ "${line:0:1}" = "[" ]] && [ "$stage" == "start" ]; then
