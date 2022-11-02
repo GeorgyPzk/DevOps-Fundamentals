@@ -7,13 +7,24 @@ new_csv_file_path="${part_csv_file_path}_new.csv"
 rm -R $new_csv_file_path
 touch $new_csv_file_path
 
-while IFS=, read -r field1 field2 field3 field4 field5 field6 # read all line and separate columns
+while IFS=, read -r field1 field2 field3 field4 field5 field6 field7 field8 # read all line and separate columns
 do
 if [[ "$field1" = "id" ]]; then
     echo "${field1},${field2},${field3},${field4},${field5},${field6}" >> $new_csv_file_path # writing column names
 else
+    SUB="\""
+    if [[ "$field4" == *"$SUB"* ]] && [[ "$field5" == *"$SUB"* ]]; then # if string have "
+        field4="${field4},${field5}"
+        field5=$field6
+        field6=$field7
+    elif [[ "$field4" == *"$SUB"* ]] && [[ "$field6" == *"$SUB"* ]]; then
+        field4="${field4},${field5},${field6}"
+        field5=$field7
+        field6=$field8
+    fi
+
     IFS=" " # separator sign for name
-    read -a name <<< "$field3"  # separating name 
+    read -a name <<< "$field3"  # separating name
     field3="${name[0]^} ${name[1]^}" # Write name with upper frist symbol
     name[1]=$(echo ${name[1]} | sed 's/-//g') # Replace -
     #field5="${name[0]:0:1}${name[1]}${field2}@abc.com" # Compiling an email
